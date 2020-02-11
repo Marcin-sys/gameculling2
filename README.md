@@ -1,2 +1,2 @@
 # gameculling2
-Gameculling with ... 
+Gameculling with Kivy.org
