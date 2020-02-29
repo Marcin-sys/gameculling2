@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://assets/code/spawner.gd" type="Script" id=4]
+
+[node name="main_scene" type="Spatial"]
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 0.842762, -0.331207, 0.424327, 0.0230036, 0.809733, 0.586347, -0.537794, -0.48439, 0.690032, 3.42915, 2.91607, 4.57241 )
+fov = 75.8644
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( -1.62921e-07, 0, -1, 0, 1, 0, 1, 0, -1.62921e-07, -10, 0, 0 )
+
+[node name="spawner" type="Node" parent="."]
+script = ExtResource( 4 )

@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Gameculling"
+run/main_scene="res://scenes/object_spawning_test.tscn"
 config/icon="res://icon.png"
 
 [rendering]
