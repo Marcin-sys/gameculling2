@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://assets/code/spawner.gd" type="Script" id=4]
+[ext_resource path="res://assets/code/spawner.gd" type="Script" id=1]
 
 [node name="main_scene" type="Spatial"]
 
@@ -12,4 +12,4 @@ fov = 75.8644
 transform = Transform( -1.62921e-07, 0, -1, 0, 1, 0, 1, 0, -1.62921e-07, -10, 0, 0 )
 
 [node name="spawner" type="Node" parent="."]
-script = ExtResource( 4 )
+script = ExtResource( 1 )
