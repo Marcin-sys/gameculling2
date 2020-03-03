@@ -5,7 +5,7 @@
 [node name="main_scene" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 0.842762, -0.331207, 0.424327, 0.0230036, 0.809733, 0.586347, -0.537794, -0.48439, 0.690032, 3.42915, 2.91607, 4.57241 )
+transform = Transform( 0.842762, -0.331207, 0.424327, 0.0230036, 0.809733, 0.586347, -0.537794, -0.48439, 0.690032, 9.09331, 5.45619, 12.7734 )
 fov = 75.8644
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
