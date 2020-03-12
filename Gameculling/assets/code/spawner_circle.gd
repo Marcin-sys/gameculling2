@@ -1,53 +1,91 @@
 extends Node
 
-var cube_scene = preload("res://scenes/cube.tscn")
-var cylinder_scene = preload("res://scenes/cylinder.tscn")
-var sphere_scene = preload("res://scenes/sphere.tscn")
+const cube_scene = preload("res://scenes/cube.tscn")
+const cylinder_scene = preload("res://scenes/cylinder.tscn")
+const sphere_scene = preload("res://scenes/sphere.tscn")
 
-var node_counter = 0						# For counting the number of objects on the screen
-var TIME_SPAN_MAX = 4						# Time period MAX till function spawn another object
-var TIME_SPAN_MIN = 1	      				# Time period MIN till function spawn another object
-var TIME_SPAN								# Time period till function spawn another object
-var time_left = 0							# Timer
-var rng = RandomNumberGenerator.new()  		# Make seed for number.
-var scenes									# Make scenes of object's.
+# Time limit's 
+const TIME_SPAN_MAX = 4							# Time period MAX till function spawn another object
+const TIME_SPAN_MIN = 1	      					# Time period MIN till function spawn another object
+var TIME_SPAN									# Time period till function spawn another object
+var time_left = 0								# Timer
 
-#Circle
-var radius = 20								# Circle radius 
-var center = Vector3(0, 0, 0)				# Circle center
-var count_segments = 20						# How much of an angle objects will be spaced around the circle.
-var angle_step = 2.0 * PI / count_segments	# 2.0*PI = 360 degrees  / segments
-var angle_random							# Random angle for object
-var posible_angle = [0]
-var count_angle
-var store_flag = []							# Store position of spawned object
-var number_of_object_can_spawn				# Random number from MIN to MAX that can spawn inside of circle
-var number_of_object_MAX = 20				# MAX number of object that can spawn inside circle
-var number_of_object_MIN = 10				# MIN number of object that can spawn inside circle
-var diffrence_in_number_of_object
-var random_flag								# Random flag in storage
-var object_to_remove
+# Circle
+const radius = 20								# Circle radius 
+const center = Vector3(0, 0, 0)					# Circle center
+const count_segments = 20						# How much of an angle objects will be spaced around the circle.
+const angle_step = 2.0 * PI / count_segments	# 2.0*PI = 360 degrees  / segments
 
+# Number of object's
+var node_counter 								# For counting the number of objects on the screen
+var number_of_object_can_spawn					# Random number from MIN to MAX that can spawn inside of circle
+const NUMBER_OF_OBJECT_MAX = 20					# MAX number of object that can spawn inside circle
+const NUMBER_OF_OBJECT_MIN = 10					# MIN number of object that can spawn inside circle
+
+
+var temporary = Generator.new()
+var rng = RandomNumberGenerator.new()  			# Make seed for number.
+
+
+
+class Generator:    	
+
+	var store_flag = [] 						# Store position of spawned object
+	func check_if_there_is_something_in_this_place(position_object_edge_circle):
+		
+		if not position_object_edge_circle in store_flag:
+			
+			store_flag.append(position_object_edge_circle)
+			print("storage is:", store_flag)
+			return "There is nothing in this position" 
+
+		return "There is something in this position"
+
+	var scenes									# Make scenes of object's.
+	func generate_object():
+		var posible_angle = [0]
+
+		for i in range(1, count_segments):
+			var count_angle = i * angle_step
+			posible_angle.append(count_angle)
+
+		var angle_random = posible_angle[randi() % posible_angle.size()]  # Random angle for object
+
+			
+		var direction = Vector3(cos(angle_random), 0, sin(angle_random))
+		var position_object_edge_circle = center + direction * radius
+
+		if check_if_there_is_something_in_this_place(position_object_edge_circle) == "There is nothing in this position":
+
+
+			var scenes = [cube_scene, cylinder_scene, sphere_scene]
+			 
+			var temporary_object = scenes[randi() % scenes.size()].instance()
+			temporary_object.set_translation(position_object_edge_circle)
+		
+			return temporary_object
+		else:
+			pass
+
+	var scene_objects_dict = {}
+	var last_dict_id = 0
+	func add_scene_object_to_dict(object):
+		scene_objects_dict[last_dict_id] = object
+
+		last_dict_id += 1
+	
+
+	
 
 func _ready():
 	rng.randomize()
-
-	scenes = [cube_scene, cylinder_scene, sphere_scene] 
-
-	for i in range(1, count_segments):
-		count_angle = i * angle_step
-		posible_angle.append(count_angle)
-
 	TIME_SPAN = rng.randi_range(TIME_SPAN_MIN, TIME_SPAN_MAX)
 
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+	# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	
 	time_left += delta
-	
-	scenes = [cube_scene, cylinder_scene, sphere_scene] 
 
 
 	if time_left > TIME_SPAN:
@@ -57,45 +95,16 @@ func _process(delta):
 		# Reset time_left.
 		time_left = 0
 
-		# Random angle
-		angle_random = posible_angle[randi() % posible_angle.size()]
-		print(angle_random)
+		var temp = temporary.generate_object()
 
-		# Position
-		var direction = Vector3(cos(angle_random), 0, sin(angle_random))
-		var position_object_edge_circle = center + direction * radius
-		
-		# If  there is no object in position -> you can spawn. 
-		if not position_object_edge_circle in store_flag:
-			
-			# Add position
-			store_flag.append(position_object_edge_circle)
-			print(store_flag)
-			
-			# Spawn random scenes
-			var temporary_object = scenes[randi() % scenes.size()].instance()
-			temporary_object.set_translation(position_object_edge_circle)
-			self.add_child(temporary_object)
+		# If in time limit nothing spawn then fast forward. 
+		if temp == null:
+			TIME_SPAN = 0
+
+		Generator.add_scene_object_to_dict(temp)
+		self.add_child(temp)
 
 
-			# # Random of object in scene
-			# number_of_object_can_spawn = rng.randi_range(number_of_object_MIN, number_of_object_MAX)
-			# print('How many object can be on scene:', number_of_object_can_spawn)
-			# # If there is to many object 
-			# if store_flag.size() > number_of_object_can_spawn:
-			# 	diffrence_in_number_of_object = store_flag.size() - number_of_object_can_spawn
-			# 	for _i in range(0, diffrence_in_number_of_object):
-			# 		print('removing object!!!')
-			# 		# Random object
-			# 		random_flag = rng.randi_range(0, number_of_object_MIN)
-			# 		# Target flag to remove
-			# 		object_to_remove = store_flag[random_flag]
-			# 		# Clean storage
-			# 		store_flag.erase(object_to_remove)
-			# 		print(store_flag.size())
-			# 		# Remove child
-
-		
 	else:
 		pass
 
