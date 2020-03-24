@@ -29,8 +29,17 @@ var rng = RandomNumberGenerator.new()  			# Make seed for number.
 
 
 class Generator:    	
-
+	var rng = RandomNumberGenerator.new() 
+	var scenes									# Make scenes of object's.
 	var store_flag = [] 						# Store position of spawned object
+	var scene_objects_dict = {}
+	var last_dict_id = 0
+
+	func time_disappear():
+		var time_when_disappear = rng.randi_range(1, 10)
+		return time_when_disappear
+
+
 	func check_if_there_is_something_in_this_place(position_object_edge_circle):
 		
 		if not position_object_edge_circle in store_flag:
@@ -41,8 +50,8 @@ class Generator:
 
 		return "There is something in this position"
 
-	var scenes									# Make scenes of object's.
 	func generate_object():
+
 		var posible_angle = [0]
 
 		for i in range(1, count_segments):
@@ -67,8 +76,7 @@ class Generator:
 		else:
 			pass
 
-	var scene_objects_dict = {}
-	var last_dict_id = 0
+
 	func add_scene_object_to_dict(object):
 		scene_objects_dict[last_dict_id] = object
 
@@ -82,8 +90,8 @@ func _ready():
 	TIME_SPAN = rng.randi_range(TIME_SPAN_MIN, TIME_SPAN_MAX)
 
 
-	# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func process(delta):
 	
 	time_left += delta
 
@@ -103,8 +111,8 @@ func _process(delta):
 
 		Generator.add_scene_object_to_dict(temp)
 		self.add_child(temp)
-
-
 	else:
 		pass
-
+	
+	var time_now = delta
+	return time_now
