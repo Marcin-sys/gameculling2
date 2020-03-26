@@ -31,12 +31,6 @@ var store_flag = [] 						# Store position of spawned object
 var scene_objects_dict = {}
 var last_dict_id = 0
 
-func time_disappear():
-	rng.randomize()
-	var time_when_disappear = rng.randi_range(5, 10)
-	return time_when_disappear
-
-
 func check_if_there_is_something_in_this_place(position_object_edge_circle):
 
 	if not position_object_edge_circle in store_flag:
@@ -63,7 +57,6 @@ func generate_object():
 
 	if check_if_there_is_something_in_this_place(position_object_edge_circle) == "There is nothing in this position":
 
-
 		var scenes = [cube_scene, cylinder_scene, sphere_scene]
 			
 		var temporary_object = scenes[randi() % scenes.size()].instance()
@@ -71,7 +64,7 @@ func generate_object():
 
 		return temporary_object
 	else:
-		pass
+		return null
 
 
 func add_scene_object_to_dict(object):
@@ -89,7 +82,6 @@ func _ready():
 func _process(delta):
 	
 	time_left += delta
-	print("czas generatora",time_left)  # do usuniecia 
 
 	if time_left > TIME_SPAN:
 		# Random time
@@ -99,13 +91,14 @@ func _process(delta):
 		time_left = 0
 
 		var temp = generate_object()
-
+		
 		# If in time limit nothing spawn then fast forward. 
 		if temp == null:
 			TIME_SPAN = 0
-
-		add_scene_object_to_dict(temp)
-		self.add_child(temp)
+		else:
+			add_scene_object_to_dict(temp)
+			self.add_child(temp)
+			temp.set_time_to_death(rng.randi_range(5, 10)) #mozesz dodac losowanie w oddzielnej funkcji
 	else:
 		pass
 	
