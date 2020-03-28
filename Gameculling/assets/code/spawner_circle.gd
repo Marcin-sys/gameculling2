@@ -5,10 +5,13 @@ const cylinder_scene = preload("res://scenes/cylinder.tscn")
 const sphere_scene = preload("res://scenes/sphere.tscn")
 
 # Time limit's 
-const TIME_SPAN_MAX = 4							# Time period MAX till function spawn another object
+const TIME_SPAN_MAX = 1							# Time period MAX till function spawn another object
 const TIME_SPAN_MIN = 1	      					# Time period MIN till function spawn another object
 var TIME_SPAN									# Time period till function spawn another object
 var time_left = 0								# Timer
+const SET_TIME_TO_DEATH_MAX = 25
+const SET_TIME_TO_DEATH_MIN = 10 
+
 
 # Circle
 const radius = 20								# Circle radius 
@@ -30,38 +33,40 @@ var scenes									# Make scenes of object's.
 var store_flag = [] 						# Store position of spawned object
 var scene_objects_dict = {}
 var last_dict_id = 0
+var position_object_edge_circle
 
-func check_if_there_is_something_in_this_place(position_object_edge_circle):
+var position_array = []
+var number_objects_in_scene = 0
+var random_position_id
 
-	if not position_object_edge_circle in store_flag:
-		
-		store_flag.append(position_object_edge_circle)
-		print("storage is:", store_flag)
-		return "There is nothing in this position" 
+func generate_array():		
+	var posible_angle = [0]
 
-	return "There is something in this position"
+	for i in range(1, count_segments): # generate array with posible position for count_segments
+		var count_angle = i * angle_step
+		posible_angle.append(count_angle)
+	for i in posible_angle:
+		var direction = Vector3(cos(i), 0, sin(i))
+		position_object_edge_circle = center + direction * radius
+		position_array.append(position_object_edge_circle)
+	for _i in range(0, count_segments):	 # generate second array with null
+		store_flag.append(null)
+
 
 func generate_object():
 
-	var posible_angle = [0]
+	random_position_id = rng.randi_range(0, position_array.size()-1)  # Random position for object
 
-	for i in range(1, count_segments):
-		var count_angle = i * angle_step
-		posible_angle.append(count_angle)
-
-	var angle_random = posible_angle[randi() % posible_angle.size()]  # Random angle for object
-
+	if store_flag[random_position_id] == null:
 		
-	var direction = Vector3(cos(angle_random), 0, sin(angle_random))
-	var position_object_edge_circle = center + direction * radius
-
-	if check_if_there_is_something_in_this_place(position_object_edge_circle) == "There is nothing in this position":
-
+		var position_for_temp = position_array[random_position_id]  # Position for temp
 		var scenes = [cube_scene, cylinder_scene, sphere_scene]
-			
+		
 		var temporary_object = scenes[randi() % scenes.size()].instance()
-		temporary_object.set_translation(position_object_edge_circle)
+		temporary_object.set_translation(position_for_temp)
 
+		store_flag[random_position_id] = 1 # change null to 1 in store_flag [random_position_id]
+		
 		return temporary_object
 	else:
 		return null
@@ -72,21 +77,29 @@ func add_scene_object_to_dict(object):
 
 	last_dict_id += 1
 	
+func _on_Timer_timeout(id, ref):
+	if number_objects_in_scene > NUMBER_OF_OBJECT_MIN:
+		store_flag[id] = null   # clear the position in store_flag
+		number_objects_in_scene -= 1
+		ref.death()
+		print('ilosc obiektow: ', number_objects_in_scene)
+
 
 func _ready():
+	generate_array()
 	rng.randomize()
 	TIME_SPAN = rng.randi_range(TIME_SPAN_MIN, TIME_SPAN_MAX)
-
+	print('Time to first spawn:', TIME_SPAN, 's')
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	
+
 	time_left += delta
 
 	if time_left > TIME_SPAN:
 		# Random time
 		TIME_SPAN = rng.randi_range(TIME_SPAN_MIN, TIME_SPAN_MAX)
-		print('Time to next spawn:', TIME_SPAN, 's')
+		
 		# Reset time_left.
 		time_left = 0
 
@@ -95,10 +108,17 @@ func _process(delta):
 		# If in time limit nothing spawn then fast forward. 
 		if temp == null:
 			TIME_SPAN = 0
-		else:
+		elif number_objects_in_scene < NUMBER_OF_OBJECT_MAX:
+			number_objects_in_scene += 1 # count objects
+			print('Time to next spawn:', TIME_SPAN, 's')
 			add_scene_object_to_dict(temp)
 			self.add_child(temp)
-			temp.set_time_to_death(rng.randi_range(5, 10)) #mozesz dodac losowanie w oddzielnej funkcji
+			temp.set_time_to_death(rng.randi_range(SET_TIME_TO_DEATH_MIN, SET_TIME_TO_DEATH_MAX))
+			temp.my_object_id(random_position_id)
+			temp.connect("timeout", self, "_on_Timer_timeout")
+			print('ilosc obiektow: ', number_objects_in_scene)
+		else:
+			pass
 	else:
 		pass
 	
