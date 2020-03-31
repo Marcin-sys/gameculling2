@@ -63,14 +63,14 @@ func on_Timer_timeout(id, ref):
 		ref.death()
 		print("ilosc obiektow: ", number_objects_in_scene)
 
-func ready():
+func _ready():
 	generate_array()
 	rng.randomize()
 	TIME_SPAN = rng.randi_range(TIME_SPAN_MIN, TIME_SPAN_MAX)
 	print("Time to first spawn:", TIME_SPAN, "s")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func process(delta):
+func _process(delta):
 
 	time_left += delta
 
