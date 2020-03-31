@@ -74,7 +74,6 @@ func _process(delta):
 
 	#rotation
 	self.global_rotate(Vector3(0, 1, 0), delta)
-	#print(self.rotation_degrees)
 
 	time_left += delta
 
@@ -94,7 +93,6 @@ func _process(delta):
 			number_objects_in_scene += 1 # count objects
 			print("Time to next spawn:", TIME_SPAN, "s")
 			self.add_child(temp)
-			print(get_tree())
 			temp.set_time_to_death(rng.randi_range(SET_TIME_TO_DEATH_MIN, SET_TIME_TO_DEATH_MAX))
 			temp.my_object_id(random_position_id)
 			temp.connect("timeout", self, "on_Timer_timeout")
@@ -103,5 +101,3 @@ func _process(delta):
 			pass
 	else:
 		pass
-
-
