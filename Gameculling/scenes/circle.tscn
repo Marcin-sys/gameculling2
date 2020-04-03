@@ -6,6 +6,7 @@
 script = ExtResource( 1 )
 
 [node name="CSGTorus" type="CSGTorus" parent="."]
+visible = false
 inner_radius = 10.053
 outer_radius = 11.831
 sides = 4
