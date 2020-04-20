@@ -5,14 +5,12 @@
 [ext_resource path="res://assets/code/generate_mesh.gd" type="Script" id=3]
 [ext_resource path="res://assets/code/MultiMeshInstance.gd" type="Script" id=4]
 
-
 [node name="main_scene" type="Spatial"]
 
 [node name="circle" parent="." instance=ExtResource( 2 )]
-visible = false
 
 [node name="Camera" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 50, 50, 50 )
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 50, 80, 50 )
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
 script = ExtResource( 3 )
